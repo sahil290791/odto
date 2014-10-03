@@ -2,13 +2,22 @@ require 'spec_helper'
 
 describe "Creating todo lists" do
 
-it "redirects to the todo list index page on success" do
-  visit "/todo_lists"
+def create_todo_list(options={})
+options[:title] ||= "My todo list"
+options[:description] ||= "My first Todo list item"
+
+ visit "/todo_lists"
   click_link "New Todo list"
   expect(page).to have_content("New todo_list")
-  fill_in "Title", with: "My todo list"
-  fill_in "Description", with: "My first list item"
+  fill_in "Title", with: options[:title]
+  fill_in "Description", with: options[:description]
   click_button "Create Todo list"
+
+end
+
+
+it "redirects to the todo list index page on success" do
+  create_todo_list
   expect(page).to have_content("My todo list")
 end
 #Title vaidation
@@ -16,14 +25,7 @@ end
 it "displays an error when no title is given todo list" do
 
   expect(TodoList.count).to eq(0)
-
-  visit "/todo_lists"
-  click_link "New Todo list"
-  expect(page).to have_content("New todo_list")
-  fill_in "Title", with: ""
-  fill_in "Description", with: "My first list item 1"
-  click_button "Create Todo list"
-
+  create_todo_list title: ""
   expect(page).to have_content("error")
   expect(TodoList.count).to eq(0)
 
@@ -35,14 +37,7 @@ it "displays an error when no title is given todo list" do
  it "displays an error when  title is less than 5 characters" do
 
   expect(TodoList.count).to eq(0)
-
-  visit "/todo_lists"
-  click_link "New Todo list"
-  expect(page).to have_content("New todo_list")
-  fill_in "Title", with: "List"
-  fill_in "Description", with: "My first list item 1"
-  click_button "Create Todo list"
-
+  create_todo_list title:"Todo"
   expect(page).to have_content("error")
   expect(TodoList.count).to eq(0)
 
@@ -55,14 +50,7 @@ it "displays an error when no title is given todo list" do
 
 it "displays an error when no description is given todo list" do
   expect(TodoList.count).to eq(0)
-
-  visit "/todo_lists"
-  click_link "New Todo list"
-  expect(page).to have_content("New todo_list")
-  fill_in "Title", with: "My first todo list"
-  fill_in "Description", with: ""
-  click_button "Create Todo list"
-
+  create_todo_list description: ""
   expect(page).to have_content("error")
   expect(TodoList.count).to eq(0)
 
@@ -72,14 +60,7 @@ end
 
 it "displays an error when description is less than 10 characters" do
   expect(TodoList.count).to eq(0)
-
-  visit "/todo_lists"
-  click_link "New Todo list"
-  expect(page).to have_content("New todo_list")
-  fill_in "Title", with: "My first todo list"
-  fill_in "Description", with: "My first"
-  click_button "Create Todo list"
-
+  create_todo_list description: "My first"
   expect(page).to have_content("error")
   expect(TodoList.count).to eq(0)
 
